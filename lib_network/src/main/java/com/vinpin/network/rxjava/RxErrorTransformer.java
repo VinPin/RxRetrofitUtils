@@ -13,7 +13,7 @@ import io.reactivex.functions.Function;
  * 预处理异常错误转换器
  *
  * @author vinpin
- *         create at 2018/03/20 14:17
+ * create at 2018/03/20 14:17
  */
 public class RxErrorTransformer<T> implements ObservableTransformer<HttpResponse<T>, T> {
 
@@ -41,13 +41,6 @@ public class RxErrorTransformer<T> implements ObservableTransformer<HttpResponse
     }
 
     private RxErrorTransformer() {
-    }
 
-    public static RxErrorTransformer getInstance() {
-        return SingletonHolder.sInstance;
-    }
-
-    private static class SingletonHolder {
-        private static final RxErrorTransformer sInstance = new RxErrorTransformer();
     }
 }
