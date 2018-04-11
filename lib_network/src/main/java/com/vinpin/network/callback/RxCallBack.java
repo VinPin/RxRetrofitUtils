@@ -1,4 +1,4 @@
-package com.vinpin.network.rxjava;
+package com.vinpin.network.callback;
 
 import android.support.annotation.NonNull;
 

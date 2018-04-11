@@ -5,7 +5,6 @@ import android.net.ParseException;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializer;
 
-import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -19,7 +18,7 @@ import retrofit2.HttpException;
  * 统一的响应异常
  *
  * @author vinpin
- *         create at 2018/03/20 15:08
+ * create at 2018/03/20 15:08
  */
 public class ApiException extends Exception {
 
@@ -59,8 +58,7 @@ public class ApiException extends Exception {
             ex = new ApiException(e, resultException.code);
             ex.message = resultException.message;
             return ex;
-        } else if (e instanceof ConnectTimeoutException
-                || e instanceof ConnectException
+        } else if (e instanceof ConnectException
                 || e instanceof UnknownHostException) {
             ex = new ApiException(e, ErrorCode.NETWORD_ERROR);
             ex.message = "无网络,请重试!";
