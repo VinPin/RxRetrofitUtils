@@ -9,15 +9,20 @@ import io.reactivex.disposables.Disposable;
 /**
  * <pre>
  *     author: vinpin
- *     time  : 2018/03/20 15:56
- *     desc  : 网络请求转换后的回调
+ *     time  : 2018/07/23 13:10
+ *     desc  : 下载文件的回调
  * </pre>
  */
-public interface ConvertCallBack<T> {
+public interface FileCallBack<T> {
     /**
      * 订阅关系
      */
     void onSubscribe(@NonNull Disposable d);
+
+    /**
+     * 下载进度
+     */
+    void onProgress(int progress, long total);
 
     /**
      * 成功

@@ -1,6 +1,7 @@
 package com.vinpin.network.exception;
 
 import android.net.ParseException;
+import android.support.annotation.NonNull;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializer;
@@ -25,6 +26,12 @@ public class ApiException extends Exception {
     public int code;
     public String message;
 
+    public ApiException(int code, String message) {
+        super();
+        this.code = code;
+        this.message = message;
+    }
+
     public ApiException(Throwable throwable, int code) {
         super(throwable);
         this.code = code;
@@ -41,9 +48,11 @@ public class ApiException extends Exception {
         this.message = message;
     }
 
-    public static ApiException handleException(Throwable e) {
+    public static ApiException handleException(@NonNull Throwable e) {
         ApiException ex;
-        if (e instanceof HttpException) {
+        if (e instanceof ApiException) {
+            return (ApiException) e;
+        } else if (e instanceof HttpException) {
             HttpException httpException = (HttpException) e;
             ex = new ApiException(e, ErrorCode.HTTP_ERROR);
             try {
@@ -52,11 +61,6 @@ public class ApiException extends Exception {
                 e1.printStackTrace();
                 ex.message = "未知错误";
             }
-            return ex;
-        } else if (e instanceof ResultException) {
-            ResultException resultException = (ResultException) e;
-            ex = new ApiException(e, resultException.code);
-            ex.message = resultException.message;
             return ex;
         } else if (e instanceof ConnectException
                 || e instanceof UnknownHostException) {
@@ -84,20 +88,6 @@ public class ApiException extends Exception {
             ex = new ApiException(e, ErrorCode.UNKNOWN);
             ex.message = "未知错误";
             return ex;
-        }
-    }
-
-    /**
-     * 服务器返回结果的异常
-     */
-    public static class ResultException extends RuntimeException {
-
-        public int code;
-        public String message;
-
-        public ResultException(int code, String message) {
-            this.code = code;
-            this.message = message;
         }
     }
 

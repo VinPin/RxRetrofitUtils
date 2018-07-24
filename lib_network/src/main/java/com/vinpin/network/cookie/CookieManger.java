@@ -30,10 +30,8 @@ public class CookieManger {
     }
 
     public HashSet<String> getCookies() {
-        HashSet<String> cookies = new HashSet<>();
         SharedPreferences sharedPreferences = RxRetrofitUtils.getContext().getSharedPreferences(FILLNAME, Context.MODE_PRIVATE);
-        cookies.addAll(sharedPreferences.getStringSet(COOKIE_PREFS, new HashSet<String>()));
-        return cookies;
+        return new HashSet<>(sharedPreferences.getStringSet(COOKIE_PREFS, new HashSet<String>()));
     }
 
     public void saveCookies(HashSet<String> cookies) {

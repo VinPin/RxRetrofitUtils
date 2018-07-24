@@ -23,7 +23,7 @@ public class RxErrorTransformer<T> implements ObservableTransformer<HttpResponse
             @Override
             public T apply(HttpResponse<T> tHttpResponse) throws Exception {
                 if (tHttpResponse.code != ApiException.ErrorCode.REQUEST_OK) {
-                    throw new ApiException.ResultException(tHttpResponse.code, tHttpResponse.msg);
+                    throw new ApiException(tHttpResponse.code, tHttpResponse.msg);
                 }
                 return tHttpResponse.result;
             }

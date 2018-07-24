@@ -7,10 +7,11 @@ import com.vinpin.network.exception.ApiException;
 import io.reactivex.disposables.Disposable;
 
 /**
- * 统一的网络请求空回调
- *
- * @author vinpin
- * create at 2018/03/20 15:56
+ * <pre>
+ *     author: vinpin
+ *     time  : 2018/03/20 15:56
+ *     desc  : 网络请求空回调
+ * </pre>
  */
 public interface EmptyCallBack {
     /**

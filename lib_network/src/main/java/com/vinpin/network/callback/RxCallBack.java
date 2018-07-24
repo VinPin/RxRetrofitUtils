@@ -8,10 +8,11 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
 /**
- * 封装的请求回调
- *
- * @author vinpin
- *         create at 2018/03/20 15:56
+ * <pre>
+ *     author: vinpin
+ *     time  : 2018/03/20 15:56
+ *     desc  : 封装的请求回调
+ * </pre>
  */
 public abstract class RxCallBack<T> implements Observer<T> {
 
@@ -27,11 +28,7 @@ public abstract class RxCallBack<T> implements Observer<T> {
 
     @Override
     public void onError(@NonNull Throwable e) {
-        if (e instanceof ApiException) {
-            onError((ApiException) e);
-        } else {
-            onError(new ApiException(e, ApiException.ErrorCode.UNKNOWN, "未知错误"));
-        }
+        onError(ApiException.handleException(e));
     }
 
     @Override
