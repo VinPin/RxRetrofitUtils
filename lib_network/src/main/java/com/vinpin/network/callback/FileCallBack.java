@@ -22,7 +22,7 @@ public interface FileCallBack<T> {
     /**
      * 下载进度
      */
-    void onProgress(int progress, long total);
+    void onProgress(int progress, long current, long total);
 
     /**
      * 成功
