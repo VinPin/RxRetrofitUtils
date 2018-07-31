@@ -8,20 +8,20 @@ import okhttp3.OkHttpClient;
  * @author vinpin
  *         create at 2018/03/20 9:57
  */
-public class HttpClient {
+public class OkHttpBuilder {
 
     private OkHttpClient.Builder builder;
 
-    private HttpClient() {
+    private OkHttpBuilder() {
         builder = new OkHttpClient.Builder();
     }
 
-    public static HttpClient getInstance() {
+    public static OkHttpBuilder getInstance() {
         return SingletonHolder.sInstance;
     }
 
     private static class SingletonHolder {
-        private static final HttpClient sInstance = new HttpClient();
+        private static final OkHttpBuilder sInstance = new OkHttpBuilder();
     }
 
     public OkHttpClient.Builder getBuilder() {

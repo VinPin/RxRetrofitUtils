@@ -148,7 +148,7 @@ public class SingleRxRetrofit {
         Retrofit.Builder singleRetrofitBuilder = new Retrofit.Builder();
         if (converterFactories.isEmpty()) {
             //获取全局的对象重新设置
-            List<Converter.Factory> listConverterFactory = RetrofitClient.getInstance().getRetrofit().converterFactories();
+            List<Converter.Factory> listConverterFactory = RetrofitBuilder.getInstance().getRetrofit().converterFactories();
             for (Converter.Factory factory : listConverterFactory) {
                 singleRetrofitBuilder.addConverterFactory(factory);
             }
@@ -160,7 +160,7 @@ public class SingleRxRetrofit {
 
         if (adapterFactories.isEmpty()) {
             //获取全局的对象重新设置
-            List<CallAdapter.Factory> listAdapterFactory = RetrofitClient.getInstance().getRetrofit().callAdapterFactories();
+            List<CallAdapter.Factory> listAdapterFactory = RetrofitBuilder.getInstance().getRetrofit().callAdapterFactories();
             for (CallAdapter.Factory factory : listAdapterFactory) {
                 singleRetrofitBuilder.addCallAdapterFactory(factory);
             }
@@ -171,7 +171,7 @@ public class SingleRxRetrofit {
         }
 
         if (TextUtils.isEmpty(baseUrl)) {
-            singleRetrofitBuilder.baseUrl(RetrofitClient.getInstance().getRetrofit().baseUrl());
+            singleRetrofitBuilder.baseUrl(RetrofitBuilder.getInstance().getRetrofit().baseUrl());
         } else {
             singleRetrofitBuilder.baseUrl(baseUrl);
         }

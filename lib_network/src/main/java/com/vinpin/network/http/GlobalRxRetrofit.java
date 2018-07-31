@@ -165,15 +165,15 @@ public class GlobalRxRetrofit {
     }
 
     public static Retrofit getGlobalRetrofit() {
-        return RetrofitClient.getInstance().getRetrofit();
+        return RetrofitBuilder.getInstance().getRetrofit();
     }
 
     public Retrofit.Builder getGlobalRetrofitBuilder() {
-        return RetrofitClient.getInstance().getRetrofitBuilder();
+        return RetrofitBuilder.getInstance().getRetrofitBuilder();
     }
 
     public OkHttpClient.Builder getGlobalOkHttpBuilder() {
-        return HttpClient.getInstance().getBuilder();
+        return OkHttpBuilder.getInstance().getBuilder();
     }
 
     /**

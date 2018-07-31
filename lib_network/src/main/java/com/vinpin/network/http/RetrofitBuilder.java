@@ -1,5 +1,6 @@
 package com.vinpin.network.http;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -11,13 +12,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * @author zwp
  *         create at 2017/3/30 13:56
  */
-public class RetrofitClient {
+public class RetrofitBuilder {
 
     private Retrofit.Builder mRetrofitBuilder;
-    private okhttp3.OkHttpClient.Builder mOkHttpBuilder;
+    private OkHttpClient.Builder mOkHttpBuilder;
 
-    private RetrofitClient() {
-        mOkHttpBuilder = HttpClient.getInstance().getBuilder();
+    private RetrofitBuilder() {
+        mOkHttpBuilder = OkHttpBuilder.getInstance().getBuilder();
 
         mRetrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -25,12 +26,12 @@ public class RetrofitClient {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
     }
 
-    public static RetrofitClient getInstance() {
+    public static RetrofitBuilder getInstance() {
         return SingletonHolder.sInstance;
     }
 
     private static class SingletonHolder {
-        private static final RetrofitClient sInstance = new RetrofitClient();
+        private static final RetrofitBuilder sInstance = new RetrofitBuilder();
     }
 
     public Retrofit.Builder getRetrofitBuilder() {

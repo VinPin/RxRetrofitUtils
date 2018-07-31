@@ -78,7 +78,7 @@ public class DownloadRxRetrofit {
     public Retrofit.Builder getSingleRetrofitBuilder() {
         Retrofit.Builder singleRetrofitBuilder = new Retrofit.Builder();
         singleRetrofitBuilder.addCallAdapterFactory(RxJava2CallAdapterFactory.create());
-        singleRetrofitBuilder.baseUrl(RetrofitClient.getInstance().getRetrofit().baseUrl());
+        singleRetrofitBuilder.baseUrl(RetrofitBuilder.getInstance().getRetrofit().baseUrl());
         singleRetrofitBuilder.client(getSingleOkHttpBuilder().build());
         return singleRetrofitBuilder;
     }
