@@ -61,7 +61,7 @@ RxDownloadUtils.getInstance().download(url, filePath, new FileCallBack<File>() {
             }
 
             @Override
-            public void onProgress(int progress, long total) {
+            public void onProgress(int progress, long current, long total) {
                 
             }
 

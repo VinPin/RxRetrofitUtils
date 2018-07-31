@@ -1,16 +1,20 @@
 package com.vinpin.network;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
 import com.vinpin.commonutils.FileUtils;
 import com.vinpin.network.callback.FileCallBack;
 import com.vinpin.network.exception.ApiException;
 import com.vinpin.network.http.DownloadRxRetrofit;
+import com.vinpin.network.retrofit.DownloadTask;
+import com.vinpin.network.retrofit.FileDownloadService;
 import com.vinpin.network.retrofit.ProgressResponseBody;
 import com.vinpin.network.rxjava.RxSchedulerHepler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -45,34 +49,50 @@ public class RxDownloadUtils {
         private static final RxDownloadUtils sInstance = new RxDownloadUtils();
     }
 
-    interface DownloadService {
-
-        @Streaming
-        @GET
-        Observable<ResponseBody> downloadFile(@Url String fileUrl);
-    }
-
     public DownloadRxRetrofit getDownloadRxRetrofit() {
         return new DownloadRxRetrofit();
     }
 
+
     /**
-     * 下载文件
+     * 下载文件（不支持断点续传，下载之前会删除已存在的文件）
      *
      * @param filePath 下载文件存储路径
      * @param callBack 下载回调
      */
-    public void download(String downloadUrl, final String filePath, final FileCallBack<File> callBack) {
+    public void download(String downloadUrl, String filePath, @NonNull final FileCallBack<File> callBack) {
+        download(downloadUrl, new HashMap<String, String>(0), filePath, callBack);
+    }
+
+    /**
+     * 下载文件（不支持断点续传，下载之前会删除已存在的文件）
+     *
+     * @param downloadUrl 下载文件地址
+     * @param headers     请求头
+     * @param filePath    下载文件存储路径
+     * @param callBack    下载回调
+     */
+    public void download(String downloadUrl, @NonNull HashMap<String, String> headers, final String filePath, @NonNull final FileCallBack<File> callBack) {
         FileUtils.createFileByDeleteOldFile(filePath);
-        getDownloadRxRetrofit().setOnProgressListener(new ProgressResponseBody.OnProgressListener() {
+        getDownloadRxRetrofit().sslSocketFactory().setOnProgressListener(new ProgressResponseBody.OnProgressListener() {
+            @SuppressLint("CheckResult")
             @Override
             public void update(long bytesRead, long contentLength) {
+                // update()是运行在子线程中
                 if (contentLength != 0) {
                     int progress = (int) (((bytesRead + 0f) / contentLength) * 100);
-                    callBack.onProgress(progress, contentLength);
+                    // 切换到主线程中更新UI
+                    Observable.just(new DownloadTask(progress, bytesRead, contentLength))
+                            .compose(RxSchedulerHepler.<DownloadTask>io_main())
+                            .subscribe(new Consumer<DownloadTask>() {
+                                @Override
+                                public void accept(DownloadTask task) {
+                                    callBack.onProgress(task.progress, task.current, task.total);
+                                }
+                            });
                 }
             }
-        }).createApi(DownloadService.class).downloadFile(downloadUrl)
+        }).createApi(FileDownloadService.class).downloadFile(downloadUrl, headers)
                 .observeOn(Schedulers.io())
                 .doOnNext(new Consumer<ResponseBody>() {
                     @Override
@@ -112,21 +132,37 @@ public class RxDownloadUtils {
      */
     public void writeResponeBodyToDisk(@NonNull String filePath, @NonNull ResponseBody body) {
         File output = new File(filePath);
+        BufferedSink sink = null;
+        BufferedSource source = null;
         try {
             if (!output.exists()) {
                 output.createNewFile();
             }
-            BufferedSink sink = Okio.buffer(Okio.sink(output));
+            sink = Okio.buffer(Okio.sink(output));
             byte[] buffer = new byte[4096];
             int len;
-            BufferedSource source = body.source();
+            source = body.source();
             while ((len = source.read(buffer)) != -1) {
                 sink.write(buffer, 0, len);
             }
-            sink.close();
-            source.close();
+            sink.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (sink != null) {
+                try {
+                    sink.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (source != null) {
+                try {
+                    source.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
