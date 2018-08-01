@@ -25,9 +25,6 @@ import okhttp3.ResponseBody;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
-import retrofit2.http.GET;
-import retrofit2.http.Streaming;
-import retrofit2.http.Url;
 
 /**
  * <pre>
@@ -75,21 +72,26 @@ public class RxDownloadUtils {
     public void download(String downloadUrl, @NonNull HashMap<String, String> headers, final String filePath, @NonNull final FileCallBack<File> callBack) {
         FileUtils.createFileByDeleteOldFile(filePath);
         getDownloadRxRetrofit().sslSocketFactory().setOnProgressListener(new ProgressResponseBody.OnProgressListener() {
+            int lasrProgress = 0;
+
             @SuppressLint("CheckResult")
             @Override
             public void update(long bytesRead, long contentLength) {
                 // update()是运行在子线程中
                 if (contentLength != 0) {
                     int progress = (int) (((bytesRead + 0f) / contentLength) * 100);
-                    // 切换到主线程中更新UI
-                    Observable.just(new DownloadTask(progress, bytesRead, contentLength))
-                            .compose(RxSchedulerHepler.<DownloadTask>io_main())
-                            .subscribe(new Consumer<DownloadTask>() {
-                                @Override
-                                public void accept(DownloadTask task) {
-                                    callBack.onProgress(task.progress, task.current, task.total);
-                                }
-                            });
+                    if (progress > lasrProgress) {
+                        // 切换到主线程中更新UI
+                        Observable.just(new DownloadTask(progress, bytesRead, contentLength))
+                                .compose(RxSchedulerHepler.<DownloadTask>io_main())
+                                .subscribe(new Consumer<DownloadTask>() {
+                                    @Override
+                                    public void accept(DownloadTask task) {
+                                        callBack.onProgress(task.progress, task.current, task.total);
+                                    }
+                                });
+                        lasrProgress = progress == 100 ? 0 : progress;
+                    }
                 }
             }
         }).createApi(FileDownloadService.class).downloadFile(downloadUrl, headers)
