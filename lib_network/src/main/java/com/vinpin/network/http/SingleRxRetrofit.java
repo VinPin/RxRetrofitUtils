@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -29,7 +32,7 @@ import retrofit2.Retrofit;
  * 可单独配置参数的网络请求工具类
  *
  * @author vinpin
- *         create at 2018/03/21 10:41
+ * create at 2018/03/21 10:41
  */
 @SuppressWarnings("unused")
 public class SingleRxRetrofit {
@@ -226,7 +229,16 @@ public class SingleRxRetrofit {
         singleOkHttpBuilder.connectTimeout(connectTimeout > 0 ? connectTimeout : 10, TimeUnit.SECONDS);
 
         if (sslParams != null) {
-            singleOkHttpBuilder.sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager);
+            singleOkHttpBuilder
+                    .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager)
+                    .hostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String hostname, SSLSession session) {
+                            //直接返回true，即不对请求的服务器IP做校验，我们不推荐这样使用。
+                            // 而且现在谷歌应用商店已经对此种做法做了限制，禁止在verify方法中直接返回true的App上线。
+                            return true;
+                        }
+                    });
         }
 
         return singleOkHttpBuilder;

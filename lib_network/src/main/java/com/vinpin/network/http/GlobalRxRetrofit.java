@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -151,7 +154,16 @@ public class GlobalRxRetrofit {
      */
     public GlobalRxRetrofit setSslSocketFactory() {
         SSLManager.SSLSocketParams sslParams = SSLManager.getSslSocketFactory();
-        getGlobalOkHttpBuilder().sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager);
+        getGlobalOkHttpBuilder()
+                .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager)
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        //直接返回true，即不对请求的服务器IP做校验，我们不推荐这样使用。
+                        // 而且现在谷歌应用商店已经对此种做法做了限制，禁止在verify方法中直接返回true的App上线。
+                        return true;
+                    }
+                });
         return this;
     }
 
@@ -160,7 +172,16 @@ public class GlobalRxRetrofit {
      */
     public GlobalRxRetrofit setSslSocketFactory(InputStream[] certificates, InputStream bksFile, String password) {
         SSLManager.SSLSocketParams sslParams = SSLManager.getSslSocketFactory(certificates, bksFile, password);
-        getGlobalOkHttpBuilder().sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager);
+        getGlobalOkHttpBuilder()
+                .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.sTrustManager)
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        //直接返回true，即不对请求的服务器IP做校验，我们不推荐这样使用。
+                        // 而且现在谷歌应用商店已经对此种做法做了限制，禁止在verify方法中直接返回true的App上线。
+                        return true;
+                    }
+                });
         return this;
     }
 
